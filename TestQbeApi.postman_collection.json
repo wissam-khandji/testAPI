@@ -1,0 +1,784 @@
+{
+	"info": {
+		"_postman_id": "368146fd-593b-4621-aa73-23731f59ea75",
+		"name": "TestQbeApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27986615"
+	},
+	"item": [
+		{
+			"name": "Creates a new submission in the CIS. Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"",
+							"//recuperation de la submission ID faite precedemment de maniere dynamique",
+							"const submissionID = pm.variables.get(\"submissionID\")",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//recuperation du body en json",
+							"const jsonData = pm.response.json();",
+							"",
+							"//recuperation des valeurs de la submission contenue dans les variables",
+							"const expectedInsuranceType = pm.variables.get(\"excess0fLossQbe\");",
+							"const expectedStartDate = pm.variables.get(\"startDateToday\");",
+							"const expectedEndDate = pm.variables.get(\"endDatePlusElevenMonth\");",
+							"const expectedBrokerCID = pm.variables.get(\"brokerCid\");",
+							"const expectedBrokerContactEmail = pm.variables.get(\"brokerContactEmail\")",
+							"const expectedInsurerCID = pm.variables.get(\"qbeDubaiInsurer\")",
+							"const expectedInsuredCID = pm.variables.get(\"insuredCID\")",
+							"",
+							"",
+							"pm.test(\"Validate status code is 200\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Recuperation du submission ID",
+							"const submissionID = jsonData.submissionId",
+							"// Stocker la valeur de submissionId dans une variable de l'environnement de maniere dynamique",
+							"pm.environment.set(\"submissionID\", submissionID);",
+							"",
+							"//to check insurance type data",
+							"pm.test(`Check insurance Type is ${expectedInsuranceType}`, function(){",
+							"    //Assertions pour verifier les données contenue dans le body",
+							"    pm.expect(jsonData.insuranceType).to.eql(expectedInsuranceType);",
+							"})",
+							"//to check policy language",
+							"pm.test(`Check Policy language is : en`, function(){",
+							"    pm.expect(jsonData.policyLanguage).to.eql(\"en\");",
+							"})",
+							"//to check domestic flag",
+							"pm.test(`Check demestic flag is : false`, function(){",
+							"    pm.expect(jsonData.domesticFlag).to.eql(false);",
+							"})",
+							"//to check export flag",
+							"pm.test(`Check export flag is : false`, function(){",
+							"     pm.expect(jsonData.exportFlag).to.eql(false);",
+							"})",
+							"//to check startDate",
+							"pm.test(`Check start date is : ${expectedStartDate}`, function(){",
+							"    pm.expect(jsonData.startDate).to.eql(expectedStartDate)",
+							"})",
+							"//to check end date",
+							"pm.test(`Check end date is : ${expectedEndDate}`, function(){",
+							"    pm.expect(jsonData.endDate).to.eql(expectedEndDate)",
+							"})",
+							"//to check Currency",
+							"pm.test(`Check Currency is : USD`, function(){",
+							"    pm.expect(jsonData.currency).to.eql(\"USD\")",
+							"})",
+							"//to check broker CID",
+							"pm.test(`check broker CID is : ${expectedBrokerCID}`, function(){",
+							"    //Convertir jsonData.brokerCid en chaîne de caractères en utilisant .toString()",
+							"    const actualBrokerCidString = jsonData.brokerCid.toString();",
+							"",
+							"    pm.expect(actualBrokerCidString).to.eql(expectedBrokerCID);;",
+							"})",
+							"// to check broker email contact",
+							"pm.test(`check broker email  is : ${expectedBrokerContactEmail}`, function(){",
+							"    pm.expect(jsonData.brokerContactEmail).to.eql(expectedBrokerContactEmail)",
+							"})",
+							"//to check insurer CID",
+							"pm.test(`check insurer CID is : ${expectedInsurerCID}`, function(){",
+							"    const actualInsurerCIDString = jsonData.insurerCid.toString();",
+							"    pm.expect(actualInsurerCIDString).to.eql(expectedInsurerCID)",
+							"})",
+							"//to check aplicant CID",
+							"pm.test(`check applicant CID is : ${expectedInsuredCID}`, function(){",
+							"    const actualApplicantCid = jsonData.applicant.cid.toString();",
+							"    pm.expect(actualApplicantCid).to.eql(expectedInsuredCID)",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"applicant\": {\n    \"cid\": {{insuredCID}},\n    \"contactLastName\": \"{{contactLastName}}\",\n    \"contactFirstName\": \"{{contactFirstName}}\",\n    \"contactEmail\": \"{{contactEmail}}\"\n  },\n  \"brokerCid\": {{brokerCid}},\n  \"brokerContactEmail\": \"{{brokerContactEmail}}\",\n  \"currency\": \"USD\",\n  \"domesticFlag\": false,\n  \"endDate\": \"{{endDatePlusElevenMonth}}\",\n  \"exportFlag\": false,\n  \"insuranceType\": \"{{excess0fLossQbe}}\",\n  \"insurerCid\": {{qbeDubaiInsurer}},\n  \"policyLanguage\": \"en\",\n  \"startDate\": \"{{startDateToday}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/submissions",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"submissions"
+					]
+				},
+				"description": "Creates a new submission in the CIS.The submission is created with the status 'New', a new submission task is created."
+			},
+			"response": [
+				{
+					"name": "The submission is created.",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"applicant\": {\n    \"cid\": -1706782,\n    \"contactLastName\": \"Ut labore esse\",\n    \"contactFirstName\": \"cupidatat est esse in ipsum\",\n    \"contactEmail\": \"ut culpa elit dolore Duis\"\n  },\n  \"brokerCid\": 12,\n  \"brokerContactEmail\": \"broker.contact@email.com\",\n  \"currency\": \"dolore laborum laboris\",\n  \"domesticFlag\": true,\n  \"endDate\": \"2022-12-31\",\n  \"exportFlag\": true,\n  \"insuranceType\": \"COMPREHENSIVE_TRADE_CREDIT\",\n  \"insurerCid\": 12,\n  \"policyLanguage\": \"aliquip reprehenderit consequat\",\n  \"startDate\": \"2022-01-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"submissions"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"applicant\": {\n    \"cid\": 55941889,\n    \"contactLastName\": \"enim \",\n    \"contactFirstName\": \"laboris et proident Lorem\",\n    \"contactEmail\": \"in sit ut aute\"\n  },\n  \"brokerCid\": 12,\n  \"currency\": \"ut sint enim\",\n  \"domesticFlag\": true,\n  \"endDate\": \"2022-12-31\",\n  \"exportFlag\": true,\n  \"insurerCid\": 12,\n  \"policyLanguage\": \"aute reprehenderit sint cillum\",\n  \"startDate\": \"2022-01-01\",\n  \"submissionId\": 12,\n  \"insuranceType\": \"COMPREHENSIVE_TRADE_CREDIT\",\n  \"brokerContactEmail\": \"broker.contact@email.com\"\n}"
+				},
+				{
+					"name": "Bad Request",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"applicant\": {\n    \"cid\": -1706782,\n    \"contactLastName\": \"Ut labore esse\",\n    \"contactFirstName\": \"cupidatat est esse in ipsum\",\n    \"contactEmail\": \"ut culpa elit dolore Duis\"\n  },\n  \"brokerCid\": 12,\n  \"brokerContactEmail\": \"broker.contact@email.com\",\n  \"currency\": \"dolore laborum laboris\",\n  \"domesticFlag\": true,\n  \"endDate\": \"2022-12-31\",\n  \"exportFlag\": true,\n  \"insuranceType\": \"COMPREHENSIVE_TRADE_CREDIT\",\n  \"insurerCid\": 12,\n  \"policyLanguage\": \"aliquip reprehenderit consequat\",\n  \"startDate\": \"2022-01-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"submissions"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"error\": \"example-code\",\n  \"message\": \"in ipsum\",\n  \"subError\": \"culpa Ut ut elit\",\n  \"parameters\": {\n    \"culpa_a6e\": {}\n  }\n}"
+				},
+				{
+					"name": "Unauthorized",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"applicant\": {\n    \"cid\": -1706782,\n    \"contactLastName\": \"Ut labore esse\",\n    \"contactFirstName\": \"cupidatat est esse in ipsum\",\n    \"contactEmail\": \"ut culpa elit dolore Duis\"\n  },\n  \"brokerCid\": 12,\n  \"brokerContactEmail\": \"broker.contact@email.com\",\n  \"currency\": \"dolore laborum laboris\",\n  \"domesticFlag\": true,\n  \"endDate\": \"2022-12-31\",\n  \"exportFlag\": true,\n  \"insuranceType\": \"COMPREHENSIVE_TRADE_CREDIT\",\n  \"insurerCid\": 12,\n  \"policyLanguage\": \"aliquip reprehenderit consequat\",\n  \"startDate\": \"2022-01-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"submissions"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"error\": \"example-code\",\n  \"message\": \"in ipsum\",\n  \"subError\": \"culpa Ut ut elit\",\n  \"parameters\": {\n    \"culpa_a6e\": {}\n  }\n}"
+				},
+				{
+					"name": "Forbidden",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"applicant\": {\n    \"cid\": -1706782,\n    \"contactLastName\": \"Ut labore esse\",\n    \"contactFirstName\": \"cupidatat est esse in ipsum\",\n    \"contactEmail\": \"ut culpa elit dolore Duis\"\n  },\n  \"brokerCid\": 12,\n  \"brokerContactEmail\": \"broker.contact@email.com\",\n  \"currency\": \"dolore laborum laboris\",\n  \"domesticFlag\": true,\n  \"endDate\": \"2022-12-31\",\n  \"exportFlag\": true,\n  \"insuranceType\": \"COMPREHENSIVE_TRADE_CREDIT\",\n  \"insurerCid\": 12,\n  \"policyLanguage\": \"aliquip reprehenderit consequat\",\n  \"startDate\": \"2022-01-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"submissions"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"error\": \"example-code\",\n  \"message\": \"in ipsum\",\n  \"subError\": \"culpa Ut ut elit\",\n  \"parameters\": {\n    \"culpa_a6e\": {}\n  }\n}"
+				},
+				{
+					"name": "Internal Server Error",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"applicant\": {\n    \"cid\": -1706782,\n    \"contactLastName\": \"Ut labore esse\",\n    \"contactFirstName\": \"cupidatat est esse in ipsum\",\n    \"contactEmail\": \"ut culpa elit dolore Duis\"\n  },\n  \"brokerCid\": 12,\n  \"brokerContactEmail\": \"broker.contact@email.com\",\n  \"currency\": \"dolore laborum laboris\",\n  \"domesticFlag\": true,\n  \"endDate\": \"2022-12-31\",\n  \"exportFlag\": true,\n  \"insuranceType\": \"COMPREHENSIVE_TRADE_CREDIT\",\n  \"insurerCid\": 12,\n  \"policyLanguage\": \"aliquip reprehenderit consequat\",\n  \"startDate\": \"2022-01-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"submissions"
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"error\": \"example-code\",\n  \"message\": \"in ipsum\",\n  \"subError\": \"culpa Ut ut elit\",\n  \"parameters\": {\n    \"culpa_a6e\": {}\n  }\n}"
+				}
+			]
+		},
+		{
+			"name": "Creates a new quote in the CIS. Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//recuperation de la submission ID faite precedemment de maniere dynamique",
+							"const submissionID = pm.variables.get(\"submissionID\")",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"// Récupérer la date du jour au format ISO 8601 (UTC)",
+							"const currentDateIso = new Date().toISOString();",
+							"",
+							"const expectedProductID = pm.variables.get(\"excessOfLossID\");",
+							"const expectedInsurerCID = pm.variables.get(\"qbeDubaiInsurer\");",
+							"const expectedInsuredCID = pm.variables.get(\"insuredCID\");",
+							"const expectedStartDate = pm.variables.get(\"startDateToday\");",
+							"",
+							"//Validate the status",
+							"pm.test(\"Validate status is 200\", function(){",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test(\"Check origin is : SUBMISSION\", function(){",
+							"    pm.expect(jsonData.origin).to.eql(\"SUBMISSION\");",
+							"})",
+							"",
+							"pm.test(\"Check status is : IN_PROGRESS\", function(){",
+							"    pm.expect(jsonData.status).to.eql(\"IN_PROGRESS\");",
+							"})",
+							"",
+							"pm.test(`Check creation date is : ${expectedStartDate}`, function() { ",
+							"    pm.expect(jsonData.creationDate).to.contain(expectedStartDate);",
+							"});",
+							"",
+							"pm.test(`Check product ID is : ${expectedProductID}`, function(){",
+							"    //pour eviter le probleme deeply equal '' transformer l'int en string",
+							"    const actualProductIDString = jsonData.product.toString();",
+							"    pm.expect(actualProductIDString).to.eql(expectedProductID);",
+							"})",
+							"",
+							"pm.test(`Check insurer CID is : ${expectedInsurerCID}`, function(){",
+							"    const actualInsurerCIDString = jsonData.insurer.toString();",
+							"    pm.expect(actualInsurerCIDString).to.eql(expectedInsurerCID);",
+							"})",
+							"",
+							"pm.test(`Check insured CID is : ${expectedInsuredCID}`, function(){",
+							"    const actualInsuredCIDString = jsonData.insured.toString();",
+							"    pm.expect(actualInsuredCIDString).to.eql(expectedInsuredCID);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"submissionId\": {{submissionID}},\n  \"productId\": {{excessOfLossID}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/quotes",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"quotes"
+					]
+				},
+				"description": "This service creates a quote, and a quote version for a given submission and product."
+			},
+			"response": [
+				{
+					"name": "The quote is created",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"submissionId\": 1234,\n  \"productId\": 12,\n  \"productName\": \"commodo dolor anim proident\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/quotes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"quotes"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"insured\": -71704324,\n  \"insurer\": 38933051,\n  \"name\": \"REN1234\",\n  \"origin\": \"RENEWAL\",\n  \"quoteId\": 5678,\n  \"status\": \"IN_PROGRESS\",\n  \"creationDate\": \"ut do reprehenderit qui\",\n  \"product\": 123,\n  \"quoteVersions\": [\n    {\n      \"quoteId\": 20,\n      \"quoteVersionId\": 13,\n      \"quoteVersionStatus\": \"ACCEPTED\",\n      \"quoteVersionStep\": \"NBI\"\n    },\n    {\n      \"quoteId\": 20,\n      \"quoteVersionId\": 13,\n      \"quoteVersionStatus\": \"ACCEPTED\",\n      \"quoteVersionStep\": \"NBI\"\n    }\n  ]\n}"
+				},
+				{
+					"name": "Bad Request",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"submissionId\": 1234,\n  \"productId\": 12,\n  \"productName\": \"commodo dolor anim proident\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/quotes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"quotes"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"error\": \"example-code\",\n  \"message\": \"in ipsum\",\n  \"subError\": \"culpa Ut ut elit\",\n  \"parameters\": {\n    \"culpa_a6e\": {}\n  }\n}"
+				},
+				{
+					"name": "Unauthorized",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"submissionId\": 1234,\n  \"productId\": 12,\n  \"productName\": \"commodo dolor anim proident\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/quotes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"quotes"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"error\": \"example-code\",\n  \"message\": \"in ipsum\",\n  \"subError\": \"culpa Ut ut elit\",\n  \"parameters\": {\n    \"culpa_a6e\": {}\n  }\n}"
+				},
+				{
+					"name": "Forbidden",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"submissionId\": 1234,\n  \"productId\": 12,\n  \"productName\": \"commodo dolor anim proident\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/quotes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"quotes"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"error\": \"example-code\",\n  \"message\": \"in ipsum\",\n  \"subError\": \"culpa Ut ut elit\",\n  \"parameters\": {\n    \"culpa_a6e\": {}\n  }\n}"
+				},
+				{
+					"name": "Internal Server Error",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"submissionId\": 1234,\n  \"productId\": 12,\n  \"productName\": \"commodo dolor anim proident\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/quotes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"quotes"
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"error\": \"example-code\",\n  \"message\": \"in ipsum\",\n  \"subError\": \"culpa Ut ut elit\",\n  \"parameters\": {\n    \"culpa_a6e\": {}\n  }\n}"
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "Test1234",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "testqa",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Calculer la date du jour",
+					"var startDateToday = new Date();",
+					"var formattedStartDate = startDateToday.toISOString().split('T')[0];",
+					"",
+					"// Calculer la date du jour pmlus 11 mois",
+					"var endDatePlusElevenMonth = new Date()",
+					"endDatePlusElevenMonth.setMonth(endDatePlusElevenMonth.getMonth() + 11);",
+					"var formattedEndDate = endDatePlusElevenMonth.toISOString().split('T')[0];",
+					"",
+					"// Définir la variable\"endDate\" avec les dates calculées",
+					"pm.variables.set('endDatePlusElevenMonth', formattedEndDate);",
+					"// Définir les variables \"startDate\"",
+					"pm.variables.set('startDateToday', formattedStartDate);",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "https://short-term-qbe-dev.eks-dev.tinubu.com/short-term",
+			"type": "string",
+			"disabled": true
+		}
+	]
+}
